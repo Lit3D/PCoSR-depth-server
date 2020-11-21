@@ -6,6 +6,7 @@ from time import time
 import pyrealsense2 as rs
 import numpy as np
 import websockets
+import ssl
 
 last_depth = None
 lock = Lock()
@@ -51,6 +52,7 @@ print(connected_devices)
 Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
 
 async def websocket_reply(websocket, path):
+  await websocket.recv()
   time_start = time()
   lock.acquire()
   result = last_depth
@@ -58,7 +60,11 @@ async def websocket_reply(websocket, path):
   await websocket.send(json.dumps(result))
   print ('Retrieval Processing Time = %i ms' %  (((time()-time_start) * 1000)) )
 
-start_server = websockets.serve(websocket_reply, port=8080)
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+server_pem = pathlib.Path(__file__).with_name("server.pem")
+ssl_context.load_cert_chain(server_pem)
+
+start_server = websockets.serve(websocket_reply, port=8080, ssl=ssl_context)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
 
