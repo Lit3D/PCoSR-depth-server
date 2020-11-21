@@ -10,6 +10,12 @@ import websockets
 last_depth = None
 lock = Lock()
 
+filters = []
+decimate = rs.decimation_filter()
+decimate.set_option(rs.option.filter_magnitude, 2)
+filters.append(decimate)
+filters.append(rs.temporal_filter())
+
 ctx = rs.context()
 connected_devices = []
 
