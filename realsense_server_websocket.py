@@ -52,39 +52,29 @@ def get_frame_in_background(device_sn):
 print(connected_devices)
 Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
 
-async def websocket_reply(websocket, path):
-  await websocket.recv()
-  time_start = time()
-  lock.acquire()
-  result = last_depth
-  lock.release()
-  await websocket.send(json.dumps(result))
-  print ('Retrieval Processing Time = %i ms' %  (((time()-time_start) * 1000)) )
+# async def websocket_reply(websocket, path):
+#   await websocket.recv()
+#   time_start = time()
+#   lock.acquire()
+#   result = last_depth
+#   lock.release()
+#   await websocket.send(json.dumps(result))
+#   print ('Retrieval Processing Time = %i ms' %  (((time()-time_start) * 1000)) )
+
+async def hello(websocket, path):
+  name = await websocket.recv()
+  print(f"< {name}")
+
+  greeting = f"Hello {name}!"
+
+  await websocket.send(greeting)
+  print(f"> {greeting}")
 
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 server_pem = pathlib.Path(__file__).with_name("server.pem")
 ssl_context.load_cert_chain(server_pem)
 
-start_server = websockets.serve(websocket_reply, port=8080, ssl=ssl_context)
+start_server = websockets.serve(hello, port=8080, ssl=ssl_context)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
-
-
-
-# def get_frame_in_background(device_sn):
-#   pipeline = rs.pipeline()
-#   config = rs.config()
-#   config.enable_device(device_sn)
-#   config.enable_stream(rs.stream.depth, 424, 240, rs.format.z16, 6)
-#   pipeline.start(config)
-#   while True:
-#     global last_depth, lock
-#     time_start = time()
-#     # Get Frame and apply filters
-#     frames = pipeline.wait_for_frames()
-#     # frames = device_manager.poll_frames()
-#     depth = frames.get_depth_frame()
-#     # for filter in filters:
-#       # depth = filter.process(depth)
-
 
