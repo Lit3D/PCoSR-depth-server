@@ -13,6 +13,9 @@ last_depth = None
 lock = Lock()
 
 filters = []
+decimate = rs.decimation_filter()
+decimate.set_option(rs.option.filter_magnitude, 2)
+filters.append(decimate)
 filters.append(rs.temporal_filter())
 filters.append(rs.hole_filling_filter(2))
 
@@ -29,7 +32,7 @@ def get_frame_in_background(device_sn):
   pipeline = rs.pipeline()
   config = rs.config()
   config.enable_device(device_sn)
-  config.enable_stream(rs.stream.depth, 480, 270, rs.format.z16, 6)
+  config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 6)
   pipeline.start(config)
   while True:
     global last_depth, lock
@@ -68,7 +71,7 @@ async def ws_loop(websocket, path):
     result = last_depth
     lock.release()
     await websocket.send(json.dumps(result))
-    await asyncio.sleep(1/6)
+    await asyncio.sleep(1)
 
   # name = await websocket.recv()
   # print(f"< {name}")
