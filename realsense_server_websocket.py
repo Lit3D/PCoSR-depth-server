@@ -65,10 +65,10 @@ async def hello(websocket, path):
   name = await websocket.recv()
   print(f"< {name}")
 
-  greeting = f"Hello {name}!"
-
-  await websocket.send(greeting)
-  print(f"> {greeting}")
+  lock.acquire()
+  result = last_depth
+  lock.release()
+  await websocket.send(json.dumps(result))
 
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 server_pem = pathlib.Path(__file__).with_name("server.pem")
