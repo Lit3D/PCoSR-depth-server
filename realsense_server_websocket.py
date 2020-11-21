@@ -27,7 +27,7 @@ for i in range(len(ctx.devices)):
   connected_devices.append(camera)
 
 def get_frame_in_background(device_sn):
-  print(device_sn)
+  # print(device_sn)
   pipeline = rs.pipeline()
   config = rs.config()
   config.enable_device(device_sn)
@@ -51,7 +51,7 @@ def get_frame_in_background(device_sn):
     lock.release()
     # print ('Last frame processing took = %3i ms\r' %  (((time()-time_start) * 1000)) , end='' )
 
-print(connected_devices)
+# print(connected_devices)
 Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
 
 # async def websocket_reply(websocket, path):
