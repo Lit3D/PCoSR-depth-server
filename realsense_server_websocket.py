@@ -4,6 +4,7 @@ from threading import Lock, Thread
 from time import time
 
 import pyrealsense2 as rs
+import numpy as np
 import websockets
 
 last_depth = None
@@ -12,6 +13,14 @@ lock = Lock()
 ctx = rs.context()
 connected_devices = []
 
+# Cnfigure the pipeline to stream at specific resoultion
+config = rs.config()
+xres, yres = 424, 240 # Set resolution
+# xres, yres = 640, 360 # Set resolution
+config.enable_stream(rs.stream.depth, xres, yres, rs.format.z16, 15)
+pipeline = rs.pipeline()
+pipeline_profile = pipeline.start(config)
+
 for i in range(len(ctx.devices)):
   print(ctx.devices[i])
   camera = ctx.devices[i].get_info(rs.camera_info.serial_number)
@@ -19,14 +28,18 @@ for i in range(len(ctx.devices)):
 
 def get_frame_in_background(device_sn):
   print(device_sn)
-  pipeline = rs.pipeline()
-  config = rs.config()
-  config.enable_device(device_sn)
-  config.enable_stream(rs.stream.depth, 424, 240, rs.format.z16, 6)
-  pipeline.start(config)
+  # pipeline = rs.pipeline()
+  # config = rs.config()
+  # config.enable_device(device_sn)
+  # config.enable_stream(rs.stream.depth, 424, 240, rs.format.z16, 6)
+  # pipeline.start(config)
   frames = pipeline.wait_for_frames()
+  frames.keep()
   depth = frames.get_depth_frame()
-  print(depth)
+  depth.keep()
+  depthData = depth.as_frame().get_data()
+  depthMat = np.asanyarray(depthData)
+  print(depthMat)
 
 print(connected_devices)
 Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
