@@ -39,11 +39,11 @@ def get_frame_in_background(device_sn):
     frames = pipeline.wait_for_frames()
     frames.keep()
     depth = frames.get_depth_frame()
-    for filter in filters:
-      depth = filter.process(depth)
+    # for filter in filters:
+      # depth = filter.process(depth)
     depth.keep()
     depthData = depth.as_frame().get_data()
-    print(len(depthData))
+    # print(len(depthData))
     depthMat = np.asanyarray(depthData)
     print(len(depthMat))
     lock.acquire()
