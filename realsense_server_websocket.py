@@ -13,14 +13,6 @@ lock = Lock()
 ctx = rs.context()
 connected_devices = []
 
-# Cnfigure the pipeline to stream at specific resoultion
-config = rs.config()
-xres, yres = 480, 270 # Set resolution
-# xres, yres = 640, 360 # Set resolution
-config.enable_stream(rs.stream.depth, xres, yres, rs.format.z16, 15)
-pipeline = rs.pipeline()
-pipeline_profile = pipeline.start(config)
-
 for i in range(len(ctx.devices)):
   print(ctx.devices[i])
   camera = ctx.devices[i].get_info(rs.camera_info.serial_number)
@@ -28,11 +20,11 @@ for i in range(len(ctx.devices)):
 
 def get_frame_in_background(device_sn):
   print(device_sn)
-  # pipeline = rs.pipeline()
-  # config = rs.config()
-  # config.enable_device(device_sn)
-  # config.enable_stream(rs.stream.depth, 424, 240, rs.format.z16, 6)
-  # pipeline.start(config)
+  pipeline = rs.pipeline()
+  config = rs.config()
+  config.enable_device(device_sn)
+  config.enable_stream(rs.stream.depth, 480, 270, rs.format.z16, 6)
+  pipeline.start(config)
   frames = pipeline.wait_for_frames()
   frames.keep()
   depth = frames.get_depth_frame()
