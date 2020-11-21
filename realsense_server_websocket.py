@@ -1,16 +1,13 @@
 import asyncio
 import pathlib
 import json
+import time
 from threading import Lock, Thread
-from time import time
 
 import pyrealsense2 as rs
 import numpy as np
 import websockets
 import ssl
-
-last_depth = None
-lock = Lock()
 
 filters = []
 decimate = rs.decimation_filter()
@@ -21,6 +18,9 @@ filters.append(rs.hole_filling_filter(2))
 
 ctx = rs.context()
 connected_devices = []
+
+last_depth = dict.fromkeys(connected_devices, [])
+lock = Lock()
 
 for i in range(len(ctx.devices)):
   print(ctx.devices[i])
@@ -36,7 +36,7 @@ def get_frame_in_background(device_sn):
   pipeline.start(config)
   while True:
     global last_depth, lock
-    time_start = time()
+    # time_start = time()
     frames = pipeline.wait_for_frames()
     frames.keep()
     depth = frames.get_depth_frame()
@@ -48,12 +48,14 @@ def get_frame_in_background(device_sn):
     depthMat = np.asanyarray(depthData)[170:350].tolist()
     # print(len(depthMat))
     lock.acquire()
-    last_depth = depthMat
+    last_depth[device_sn] = depthMat
     lock.release()
     # print ('Last frame processing took = %3i ms\r' %  (((time()-time_start) * 1000)) , end='' )
 
 # print(connected_devices)
-Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
+for device_sn in connected_devices:
+  Thread(target=get_frame_in_background, args=(device_sn,)).start()
+  time.sleep(3)
 
 # async def websocket_reply(websocket, path):
 #   await websocket.recv()
@@ -71,7 +73,7 @@ async def ws_loop(websocket, path):
     result = last_depth
     lock.release()
     await websocket.send(json.dumps(result))
-    await asyncio.sleep(1)
+    await asyncio.sleep(1/4)
 
   # name = await websocket.recv()
   # print(f"< {name}")
