@@ -45,7 +45,7 @@ def get_frame_in_background(device_sn):
     depthData = depth.as_frame().get_data()
     depthMat = np.asanyarray(depthData)
     lock.acquire()
-    last_depth = depthMat
+    last_depth = depthMat.tolist()
     lock.release()
     print ('Last frame processing took = %3i ms\r' %  (((time()-time_start) * 1000)) , end='' )
 
