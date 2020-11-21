@@ -45,7 +45,7 @@ def get_frame_in_background(device_sn):
     depth.keep()
     depthData = depth.as_frame().get_data()
     # print(len(depthData))
-    depthMat = np.asanyarray(depthData)[200:350].tolist()
+    depthMat = np.asanyarray(depthData)[150:350].tolist()
     # print(len(depthMat))
     lock.acquire()
     last_depth = depthMat
