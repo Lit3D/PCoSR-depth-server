@@ -27,7 +27,7 @@ def get_frame_in_background(device_sn):
   print(depth)
 
 print(connected_devices)
-Thread(target=thread_function, args=(connected_devices[0],)).start()
+Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
 
 # def get_frame_in_background(device_sn):
 #   pipeline = rs.pipeline()
