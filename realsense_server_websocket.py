@@ -3,7 +3,6 @@ import pathlib
 import json
 from threading import Lock, Thread
 from time import time
-import datetime
 
 import pyrealsense2 as rs
 import numpy as np
@@ -64,8 +63,10 @@ Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
 
 async def ws_loop(websocket, path):
   while True:
-    now = datetime.datetime.utcnow().isoformat() + "Z"
-    await websocket.send(now)
+    lock.acquire()
+    result = last_depth
+    lock.release()
+    await websocket.send(json.dumps(result))
     await asyncio.sleep(1)
 
   # name = await websocket.recv()
