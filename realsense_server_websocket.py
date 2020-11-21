@@ -68,7 +68,7 @@ async def ws_loop(websocket, path):
     result = last_depth
     lock.release()
     await websocket.send(json.dumps(result))
-    await asyncio.sleep(1)
+    await asyncio.sleep(1/6)
 
   # name = await websocket.recv()
   # print(f"< {name}")
