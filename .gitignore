@@ -19,6 +19,9 @@ Thumbs.db
 ### IntelliJ ###
 .idea
 
+### SSL Certificates ###
+server.pem
+
 ### Runtime environment ###
 *.env
 *.lock
