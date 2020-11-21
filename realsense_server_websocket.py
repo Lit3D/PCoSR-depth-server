@@ -1,5 +1,5 @@
 import pyrealsense2 as rs
 
-pipeline = rs.pipeline()
-pipeline.start()
-print(pipeline)
+ctx = rs.context()
+devices = ctx.query_devices()
+print(devices)
