@@ -3,6 +3,7 @@ import pathlib
 import json
 from threading import Lock, Thread
 from time import time
+import datetime
 
 import pyrealsense2 as rs
 import numpy as np
@@ -47,7 +48,7 @@ def get_frame_in_background(device_sn):
     lock.acquire()
     last_depth = depthMat.tolist()
     lock.release()
-    print ('Last frame processing took = %3i ms\r' %  (((time()-time_start) * 1000)) , end='' )
+    # print ('Last frame processing took = %3i ms\r' %  (((time()-time_start) * 1000)) , end='' )
 
 print(connected_devices)
 Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
@@ -61,20 +62,25 @@ Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
 #   await websocket.send(json.dumps(result))
 #   print ('Retrieval Processing Time = %i ms' %  (((time()-time_start) * 1000)) )
 
-async def hello(websocket, path):
-  name = await websocket.recv()
-  print(f"< {name}")
+async def ws_loop(websocket, path):
+  while True:
+    now = datetime.datetime.utcnow().isoformat() + "Z"
+    await websocket.send(now)
+    await asyncio.sleep(1)
 
-  lock.acquire()
-  result = last_depth
-  lock.release()
-  await websocket.send(json.dumps(result))
+  # name = await websocket.recv()
+  # print(f"< {name}")
+
+  # lock.acquire()
+  # result = last_depth
+  # lock.release()
+  # await websocket.send(json.dumps(result))
 
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 server_pem = pathlib.Path(__file__).with_name("server.pem")
 ssl_context.load_cert_chain(server_pem)
 
-start_server = websockets.serve(hello, port=8080, ssl=ssl_context)
+start_server = websockets.serve(ws_loop, port=8080, ssl=ssl_context)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
 
