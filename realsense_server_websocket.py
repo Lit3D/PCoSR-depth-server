@@ -62,6 +62,7 @@ Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
 #   print ('Retrieval Processing Time = %i ms' %  (((time()-time_start) * 1000)) )
 
 async def ws_loop(websocket, path):
+  print(path)
   while True:
     lock.acquire()
     result = last_depth
