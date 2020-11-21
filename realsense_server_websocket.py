@@ -1,6 +1,10 @@
 import pyrealsense2 as rs
 
 ctx = rs.context()
-devices = ctx.query_devices()
-print(devices[0])
-print(devices[1])
+connected_devices = []
+
+for i in range(len(ctx.devices)):
+  camera = ctx.devices[i].get_info(rs.camera_info.serial_number)
+  connected_devices.append(camera)
+
+print(connected_devices)
