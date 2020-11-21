@@ -15,9 +15,9 @@ connected_devices = []
 
 # Cnfigure the pipeline to stream at specific resoultion
 config = rs.config()
-xres, yres = 1280, 720 # Set resolution
+xres, yres = 480, 270 # Set resolution
 # xres, yres = 640, 360 # Set resolution
-config.enable_stream(rs.stream.depth, xres, yres, rs.format.z16, 6)
+config.enable_stream(rs.stream.depth, xres, yres, rs.format.z16, 15)
 pipeline = rs.pipeline()
 pipeline_profile = pipeline.start(config)
 
