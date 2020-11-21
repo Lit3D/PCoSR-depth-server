@@ -4,6 +4,7 @@ from threading import Lock, Thread
 from time import time
 
 import pyrealsense2 as rs
+import websockets
 
 last_depth = None
 lock = Lock()
@@ -17,6 +18,7 @@ for i in range(len(ctx.devices)):
   connected_devices.append(camera)
 
 def get_frame_in_background(device_sn):
+  print(device_sn)
   pipeline = rs.pipeline()
   config = rs.config()
   config.enable_device(device_sn)
@@ -28,6 +30,16 @@ def get_frame_in_background(device_sn):
 
 print(connected_devices)
 Thread(target=get_frame_in_background, args=(connected_devices[0],)).start()
+
+async def websocket_reply(websocket, path):
+  received = await websocket.recv()
+  print(received)
+
+start_server = websockets.serve(websocket_reply, "localhost", 8787)
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()
+
+
 
 # def get_frame_in_background(device_sn):
 #   pipeline = rs.pipeline()
