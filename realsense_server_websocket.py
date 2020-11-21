@@ -39,15 +39,15 @@ def get_frame_in_background(device_sn):
     frames = pipeline.wait_for_frames()
     frames.keep()
     depth = frames.get_depth_frame()
-    # for filter in filters:
-      # depth = filter.process(depth)
+    for filter in filters:
+      depth = filter.process(depth)
     depth.keep()
     depthData = depth.as_frame().get_data()
     # print(len(depthData))
-    depthMat = np.asanyarray(depthData)
-    print(len(depthMat))
+    depthMat = np.asanyarray(depthData).tolist()
+    # print(len(depthMat))
     lock.acquire()
-    last_depth = depthMat.tolist()
+    last_depth = depthMat
     lock.release()
     # print ('Last frame processing took = %3i ms\r' %  (((time()-time_start) * 1000)) , end='' )
 
