@@ -12,7 +12,7 @@ ctx = rs.context()
 connected_devices = []
 
 for i in range(len(ctx.devices)):
-  print(devices[i])
+  print(ctx.devices[i])
   camera = ctx.devices[i].get_info(rs.camera_info.serial_number)
   connected_devices.append(camera)
 
